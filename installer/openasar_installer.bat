@@ -4,28 +4,50 @@ rem This is required for the for loops to work properly
 setlocal enabledelayedexpansion
 
 rem lil animation, can be skipped by pressing any key 3 times
-call :displayText "#"
-call :displayText "="
 call :displayText "."
+cls
+call :displayText "="
+cls
+call :displayText "#"
 
+
+rem Check Discords
+set /a DiscordMath=10
+if exist "%localappdata%\Discord\" (set /a DiscordMath=%DiscordMath%*2)
+if exist "%localappdata%\DiscordPTB\" (set /a DiscordMath=%DiscordMath%*3)
+if exist "%localappdata%\DiscordCanary\" (set /a DiscordMath=%DiscordMath%*5)
+if exist "%localappdata%\DiscordDevelopment\" (set /a DiscordMath=%DiscordMath%*7)
 rem Discord flavor selection menu
 echo.
-echo Installer updated by @aaronliu and maintained by @GreenMan36
-echo.
-echo Select Discord version:
-echo 1. Discord Stable (Default Client)
-echo 2. Discord PTB
-echo 3. Discord Canary
+echo [94mSelect Discord version:[0m
+set /a "DM=%DiscordMath%/2"
+if %DM:~-1% equ 0 (echo 1. Discord Stable (Default^)) else echo [2m[9m1. Discord Stable [29m (Not Installed)[0m  & set "DM=%DiscordMath%"
+set /a "DM=%DiscordMath%/3"
+if %DM:~-1% equ 0 (echo 2. Discord PTB) else echo [2m[9m2. Discord PTB [29m(Not Installed)[0m & set "DM=%DiscordMath%"
+set /a "DM=%DiscordMath%/5"
+if %DM:~-1% equ 0 (echo 3. Discord Canary) else echo [2m[9m3. Discord Canary [29m(Not Installed)[0m & set "DM=%DiscordMath%"
+set /a "DM=%DiscordMath%/7"
+if %DM:~-1% equ 0 (echo 4. Discord Development) else echo [2m[9m4. Discord Development [29m(Not Installed)[0m & set "DM=%DiscordMath%"
+if %DiscordMath% equ 20 set "selection=1"
+if %DiscordMath% equ 30 set "selection=2"
+if %DiscordMath% equ 50 set "selection=3"
+if %DiscordMath% equ 70 set "selection=4"
+if "%selection%"=="" (echo a > NUL) else echo. & echo Only one Discord installation detected & goto :selection
+echo 0. [1mAll[0m
 echo.
 set /p "selection=Enter the number corresponding to your selection: "
 echo.
-
+:selection
 if "%selection%"=="1" (
     set "discordApp=Discord"
 ) else if "%selection%"=="2" (
     set "discordApp=DiscordPTB"
 ) else if "%selection%"=="3" (
     set "discordApp=DiscordCanary"
+) else if "%selection%"=="4" (
+    set "discordApp=DiscordDevelopment"
+) else if "%selection%"=="0" (
+    set "discordApp=Discor*"
 ) else if "%selection%"=="" (
     echo No input detected. Defaulting to Discord Stable.
     set "discordApp=Discord"
@@ -33,7 +55,7 @@ if "%selection%"=="1" (
 	color 04
     echo Invalid selection. Please try again.
     color
-    pause
+    timeout /t 5
     exit /b
 )
 
@@ -76,7 +98,7 @@ if "!latestVersion!"=="0.0.0" (
     color 04
     echo No version folders found.
     color
-    pause
+    timeout /t 5
     exit /b
 )
 
@@ -94,7 +116,7 @@ cls
 
 rem Let the user make sure all info is correct before continuing
 echo.
-echo Installer updated by @aaronliu and maintained by @GreenMan36
+echo Installer updated by [34m@aaronliu[0m and [32m@GreenMan36[0, maintained by [95m@Git-North[0m
 echo.
 echo Confirm the following information before continuing.
 echo.
@@ -102,22 +124,57 @@ echo Version: %discordApp%
 echo App version: %latestVersion%
 echo Full path: %localappdata%\%discordApp%\app-%latestVersion%\resources\
 echo.
-pause
+timeout /t 5
 
 echo Installing OpenAsar... (ignore any flashes, this is a download progress bar)
 echo.
+
 echo 1. Backing up original app.asar to app.asar.backup
 rem Popular client mods use these files as the asar to read discord from
-if exist "%localappdata%\%discordApp%\app-%latestVersion%\resources\_app.asar" (
-    echo Detected Vencord installation, installing to _app.asar instead.
-    move /y "%localappdata%\%discordApp%\app-%latestVersion%\resources\_app.asar" "%localappdata%\%discordApp%\app-%latestVersion%\resources\_app.asar.backup" >nul
-) else ( if exist "%localappdata%\%discordApp%\app-%version%\resources\app.orig.asar" (
-    echo Detected Replugged installation, installing to app.orig.asar instead.
-    move /y "%localappdata%\%discordApp%\app-%latestVersion%\resources\app.orig.asar" "%localappdata%\%discordApp%\app-%latestVersion%\resources\app.orig.asar.backup" >nul
-) else (
-    rem No mod known
-    move /y "%localappdata%\%discordApp%\app-%latestVersion%\resources\app.asar" "%localappdata%\%discordApp%\app-%latestVersion%\resources\app.asar.backup" >nul
-))
+
+set fileSizeLimit=1024
+
+rem Check if _app.asar exists and its size is less than the limit (1024 KB)
+for %%F in ("%localappdata%\%discordApp%\app-%latestVersion%\resources\_app.asar") do (
+    set fileSize=%%~zF
+    echo Checking _app.asar file size: !fileSize!
+    if !fileSize! LSS %fileSizeLimit% (
+        echo File is smaller than 1024 KB, deleting _app.asar instead of backing it up.
+        del /f /q "%%F"
+    ) else (
+        echo Detected Vencord installation, installing to _app.asar instead.
+        move /y "%%F" "%localappdata%\%discordApp%\app-%latestVersion%\resources\_app.asar.backup" >nul
+    )
+)
+
+rem Check if app.orig.asar exists and its size is less than the limit (1024 KB)
+for %%F in ("%localappdata%\%discordApp%\app-%latestVersion%\resources\app.orig.asar") do (
+    set fileSize=%%~zF
+    echo Checking app.orig.asar file size: !fileSize!
+    if !fileSize! LSS %fileSizeLimit% (
+        echo File is smaller than 1024 KB, deleting app.orig.asar instead of backing it up.
+        del /f /q "%%F"
+    ) else (
+        echo Detected Replugged installation, installing to app.orig.asar instead.
+        move /y "%%F" "%localappdata%\%discordApp%\app-%latestVersion%\resources\app.orig.asar.backup" >nul
+    )
+)
+
+rem Final check for the default app.asar file
+for %%F in ("%localappdata%\%discordApp%\app-%latestVersion%\resources\app.asar") do (
+    set fileSize=%%~zF
+    echo Checking app.asar file size: !fileSize!
+    if !fileSize! LSS %fileSizeLimit% (
+        echo File is smaller than 1024 KB, deleting app.asar instead of backing it up.
+        del /f /q "%%F"
+    ) else (
+        echo No mod known, backing up app.asar.
+        move /y "%%F" "%localappdata%\%discordApp%\app-%latestVersion%\resources\app.asar.backup" >nul
+    )
+)
+
+timeout /t 5
+
 
 rem If the copy command failed, exit
 if errorlevel 1 (
@@ -126,7 +183,7 @@ if errorlevel 1 (
     echo Please check the file paths and try again.
     echo.
     color
-    pause
+    timeout /t 5
     exit
 )
 
@@ -151,7 +208,7 @@ if not %errorlevel%==0 (
 
     if not %errorlevel%==0 (
         echo Error: Failed to restore the backup. Check %localappdata%\%discordApp%\app-%latestVersion%\resources\ and make sure to restore the .backup file to .asar for Discord to be able to launch again.
-        pause
+        timeout /t 5
     ) else (
         echo Backup restored successfully. Discord was not modded but should be able to be launched.
     )
@@ -170,14 +227,12 @@ C:\Windows\System32\TIMEOUT.exe /t 1 /nobreak > nul 2> nul
 echo.
 echo.
 echo OpenAsar should be installed! You can check by looking for an "OpenAsar" option in your Discord settings.
-echo Not installed? Try restarting Discord, running the script again, joining the OpenAsar Discord or contacting @GreenMan36 on Discord.
-echo.
-echo Installer updated by @aaronliu and maintained by @GreenMan36
-echo Also check out some of my other projects at https://GreenMan36.github.io
+echo Not installed? Try restarting Discord, running the script again.
 echo.
 
+
 echo.
-pause
+timeout /t 15
 color
 
 goto :eof
@@ -186,7 +241,7 @@ rem Subroutine to display text
 :displayText
 set "c=%~1"
 echo.
-echo Installer updated by @aaronliu and maintained by @GreenMan36
+echo Installer updated by [34m@aaronliu[0m and [32m@GreenMan36[0, maintained by [95m@Git-North[0m
 echo.
 echo !c!!c!!c!!c!  !c!!c!!c!  !c!!c!!c!!c! !c!   !c!      !c!!c!  !c!!c!!c!!c!  !c!!c!  !c!!c!!c!  
 echo !c!  !c!  !c!  !c! !c!    !c!!c!  !c!     !c!  !c! !c!    !c!  !c! !c!  !c! 
@@ -195,7 +250,8 @@ echo !c!  !c!  !c!    !c!    !c!  !c!!c!     !c!  !c!    !c! !c!  !c! !c!  !c!
 echo !c!!c!!c!!c!  !c!    !c!!c!!c!!c! !c!   !c!  !c!  !c!  !c! !c!!c!!c!!c! !c!  !c! !c!  !c! 
 echo.
 C:\Windows\System32\TIMEOUT.exe /t 1 > nul 2> nul
-cls
+
 goto :eof
 
 exit /b
+
