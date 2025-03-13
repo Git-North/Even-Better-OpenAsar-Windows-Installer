@@ -22,7 +22,6 @@ If there's any issues, the installer will give you a nice error message which an
 ## Misc
 
 - No, Ducko doesn't want to use this script as the main Windows script.
-- Please also check out some of my other projects at [GreenMan36.github.io](https://GreenMan36.github.io) or [github.com/GreenMan36](https://github.com/GreenMan36).
 - My OpenAsar supported Discord themes: [![Discord](https://img.shields.io/discord/1050062854860046417?color=7289da&logo=discord&logoColor=white)](https://discord.gg/A6vwGchJYs)
 
 ----
