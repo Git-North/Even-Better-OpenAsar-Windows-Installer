@@ -22,7 +22,8 @@ If there's any issues, the installer will give you a nice error message which an
 ## Misc
 
 - No, Ducko doesn't want to use this script as the main Windows script.
-- My OpenAsar supported Discord themes: [![Discord](https://img.shields.io/discord/1050062854860046417?color=7289da&logo=discord&logoColor=white)](https://discord.gg/A6vwGchJYs)
+- For an Bash script check out [@aaronliu0130's script](https://github.com/aaronliu0130/Better-OpenAsar-Installer/blob/main/installer/openasar-install.bash=
+- Original script's author's OpenAsar supported Discord themes: [![Discord](https://img.shields.io/discord/1050062854860046417?color=7289da&logo=discord&logoColor=white)](https://discord.gg/A6vwGchJYs)
 
 ----
 original readme starts here.
