@@ -17,6 +17,7 @@ if exist "%localappdata%\Discord\" (set /a DiscordMath=%DiscordMath%*2)
 if exist "%localappdata%\DiscordPTB\" (set /a DiscordMath=%DiscordMath%*3)
 if exist "%localappdata%\DiscordCanary\" (set /a DiscordMath=%DiscordMath%*5)
 if exist "%localappdata%\DiscordDevelopment\" (set /a DiscordMath=%DiscordMath%*7)
+
 rem Discord flavor selection menu
 echo.
 echo [94mSelect Discord version:[0m
@@ -32,7 +33,8 @@ if %DiscordMath% equ 20 set "selection=1"
 if %DiscordMath% equ 30 set "selection=2"
 if %DiscordMath% equ 50 set "selection=3"
 if %DiscordMath% equ 70 set "selection=4"
-if "%selection%"=="" (echo a > NUL) else echo. & echo Only one Discord installation detected & goto :selection
+if not "%~1"=="" set "selection=%~1"
+if "%selection%"=="" (echo a > NUL) else echo. & echo Only one Discord installation detected or a command line argument was passed & goto :selection
 echo 0. [1mAll[0m
 echo.
 set /p "selection=Enter the number corresponding to your selection: "
@@ -47,7 +49,11 @@ if "%selection%"=="1" (
 ) else if "%selection%"=="4" (
     set "discordApp=DiscordDevelopment"
 ) else if "%selection%"=="0" (
-    set "discordApp=Discor*"
+    start "" cmd /c %~0 1
+    start "" cmd /c %~0 2
+    start "" cmd /c %~0 3
+    start "" cmd /c %~0 4
+    
 ) else if "%selection%"=="" (
     echo No input detected. Defaulting to Discord Stable.
     set "discordApp=Discord"
